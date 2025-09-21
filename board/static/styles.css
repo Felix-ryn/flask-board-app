@@ -26,8 +26,11 @@ width: 80%;
 margin: 0 auto;
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
  
 =======
+=======
+>>>>>>> 8c25f89a8e9b5e600f196c48fe828b69a4d8c203
 
 article,
 form {
@@ -81,4 +84,7 @@ form {
   margin: 0;
   padding: 0;
 }
+<<<<<<< HEAD
 >>>>>>> 8c25f89 (Fix: Solved 404 Not Found for /posts endpoint and fixed AttributeError in database.py)
+=======
+>>>>>>> 8c25f89a8e9b5e600f196c48fe828b69a4d8c203
