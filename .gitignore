@@ -1,6 +1,5 @@
 # Virtual environment
 venv/
-.env
 .venv
 
 # Compiled Python files
@@ -10,4 +9,4 @@ __pycache__/
 
 # Database
 instance/
-*.sqlite
+
