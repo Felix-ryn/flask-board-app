@@ -1,10 +1,13 @@
 import sqlite3
 import click
+import psycopg2
 from flask import current_app, g
+
 
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
 
 @click.command("init-db")
 def init_db_command():
@@ -13,8 +16,10 @@ def init_db_command():
     with current_app.open_resource("schema.sql") as f:
         db.executescript(f.read().decode("utf-8"))
 
-    click.echo("You successfully initialized the database!")
+    click.echo("You successfully initialized the SQLite database!")
 
+
+# === SQLite connection (legacy) ===
 def get_db():
     if "db" not in g:
         g.db = sqlite3.connect(
@@ -25,10 +30,18 @@ def get_db():
 
     return g.db
 
+
+# === PostgreSQL connection (active) ===
 def get_pg_db_conn():
-	conn = psycopg2.connect(host="board-app-psql-db-1", database="flask_db",
-user="admin", password="P4ssw0rd", port="5432")
-	return conn
+    conn = psycopg2.connect(
+        host="psql-db",        # sesuai hostname di docker-compose.yml
+        database="flask_db",
+        user="admin",
+        password="P4ssw0rd",
+        port="5432"
+    )
+    return conn
+
 
 def close_db(e=None):
     db = g.pop("db", None)
