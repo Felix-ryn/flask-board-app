@@ -11,13 +11,21 @@ def init_app(app):
 
 @click.command("init-db")
 def init_db_command():
-    db = get_db()
+    # GANTI: db = get_db()
+    # DENGAN: conn = get_pg_db_conn()
+
+    conn = get_pg_db_conn() # Gunakan koneksi PostgreSQL
+    cur = conn.cursor()
 
     with current_app.open_resource("schema.sql") as f:
-        db.executescript(f.read().decode("utf-8"))
+        # Gunakan cursor PostgreSQL untuk menjalankan skema
+        cur.execute(f.read().decode("utf-8"))
 
-    click.echo("You successfully initialized the SQLite database!")
+    conn.commit()
+    cur.close()
+    conn.close()
 
+    click.echo("You successfully initialized the PostgreSQL database!")
 
 # === SQLite connection (legacy) ===
 def get_db():
@@ -33,15 +41,20 @@ def get_db():
 
 # === PostgreSQL connection (active) ===
 def get_pg_db_conn():
-    conn = psycopg2.connect(
-        host="psql-db",        # sesuai hostname di docker-compose.yml
-        database="flask_db",
-        user="admin",
-        password="P4ssw0rd",
-        port="5432"
-    )
-    return conn
+    # Ambil connection string penuh dari konfigurasi aplikasi
+    # Kunci 'DATABASE' atau 'FLASK_DATABASE' harusnya sudah diisi dari .env
+    db_url = current_app.config.get('DATABASE') 
 
+    # Jika Anda menggunakan FLASK_DATABASE di .env, pastikan Anda juga mencoba kunci itu.
+    if not db_url:
+         db_url = current_app.config.get('FLASK_DATABASE')
+
+    if not db_url:
+        raise RuntimeError("PostgreSQL connection URL not found in Flask config.")
+
+    # Psycopg2 secara otomatis dapat mem-parsing URL penuh ini
+    conn = psycopg2.connect(db_url)
+    return conn
 
 def close_db(e=None):
     db = g.pop("db", None)
